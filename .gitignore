@@ -1,0 +1,8 @@
+.python-version
+.cache
+__pycache__/
+*.py[cod]
+*$py.class
+.env
+*.pkl
+demo/
