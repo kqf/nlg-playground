@@ -9,5 +9,5 @@ train $(model).pkl: $(dataset)
 
 generate: $(model).pkl 
 	python model/generate.py -l 20 -w 12 $(model)
-# 	python freq.py -l 20 -w 12 demo/hmm.builtin.8.freqdist demo/hmm.builtin.8.le
-# 	python rnd.py -l 20 -w 12 demo/hmm.builtin.8.le
+# 	python model/freq.py -l 20 -w 12 demo/hmm.builtin.8.freqdist demo/hmm.builtin.8.le
+# 	python model/rnd.py -l 20 -w 12 demo/hmm.builtin.8.le
