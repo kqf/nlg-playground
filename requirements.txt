@@ -1,4 +1,5 @@
 setuptools
+click
 pytest
 numpy
 scipy

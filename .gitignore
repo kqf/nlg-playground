@@ -4,5 +4,6 @@ __pycache__/
 *.py[cod]
 *$py.class
 .env
+*.egg-info/
 *.pkl
 demo/

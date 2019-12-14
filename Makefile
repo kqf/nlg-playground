@@ -5,7 +5,7 @@ data $(dataset): model/dataset.py
 	python model/dataset.py
 
 train $(model).pkl: $(dataset)
-	python model/train.py -n 9 -o demo/hmm < $(dataset)
+	train -n 9 -o demo/hmm < $(dataset)
 
 generate: $(model).pkl 
 	python model/generate.py -l 20 -w 12 $(model)
