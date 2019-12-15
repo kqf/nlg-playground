@@ -1,0 +1,3 @@
+Natural Language Generation playground [![Build Status](https://travis-ci.com/kqf/nlg-playground.svg?branch=master)](https://travis-ci.com/kqf/nlg-playground)
+
+Tests in progress ...
