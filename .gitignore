@@ -6,4 +6,4 @@ __pycache__/
 .env
 *.egg-info/
 *.pkl
-demo/
+artifacts/
