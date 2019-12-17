@@ -7,4 +7,6 @@ install:
   - pip install .
 
 # Trains and generates the output
-script: make generate
+script:
+  - pytest -s tests
+  - make generate

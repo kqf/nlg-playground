@@ -1,12 +1,39 @@
 import click
 import sys
-import pickle
 import numpy as np
 
 import joblib
 from sklearn.preprocessing import LabelEncoder
+from sklearn.pipeline import make_pipeline
+from sklearn.base import BaseEstimator, TransformerMixin
 from hmmlearn import hmm
 from nltk import FreqDist
+
+
+class TextVectorizer(BaseEstimator, TransformerMixin):
+    def __init__(self):
+        self.le = LabelEncoder()
+        self.fd = None
+
+    def fit(self, X, y=None):
+        self.le = LabelEncoder()
+        self.le.fit(list(set(X)))
+        self.fd = FreqDist(self.le.transform(X))
+        return self
+
+    def transform(self, X):
+        labels = np.atleast_2d(
+            np.fromiter(self.le.transform(X), np.int64)).T
+        return labels
+
+
+class DumpTrasformer(BaseEstimator, TransformerMixin):
+    def fit(self, X, y=None):
+        return self
+
+    def transform(self, X):
+        print("The dataset shape", X.shape)
+        return X
 
 
 def warn(msg):
@@ -53,39 +80,21 @@ MODELS = {
     '--modelname', '-m', default='builtin',
     type=click.Choice(list(MODELS.keys())),
 )
-@click.option('--output', '-o', default="demo/hmm")
+@click.option('--output', '-o', default="artifacts/")
 @click.option('--inputs', default=sys.stdin, required=True)
 def main(modelname, num_states, output, inputs):
     np.random.seed(seed=None)
     # args = args.parse_args()
     lines = [line.split() for line in inputs]
     words = [word.lower() for line in lines for word in line]
-
-    alphabet = set(words)
-    le = LabelEncoder()
-    le.fit(list(alphabet))
-
-    seq = le.transform(words)
-    features = np.fromiter(seq, np.int64)
-    features = np.atleast_2d(features).T
-    fd = FreqDist(seq)
-
-    model = MODELS[modelname](num_states)
-
     lengths = [len(line) for line in lines]
-    print(features)
-    model = model.fit(features, lengths)
 
-    print(outfile(output, modelname, num_states, "pkl"))
-    joblib.dump(model, outfile(output, modelname, num_states, "pkl"))
-    with open(outfile(output, modelname, num_states, "le"), "wb") as f:
-        pickle.dump(le, f)
-
-    with open(outfile(output, modelname, num_states, "freqdist"), "wb") as f:
-        pickle.dump(fd, f)
-
-    warn("Output written to:\n\t- {0}\n\t- {1}\n\t- {2}".format(
-        outfile(output, modelname, num_states, "pkl"),
-        outfile(output, modelname, num_states, "le"),
-        outfile(output, modelname, num_states, "freqdist")
-    ))
+    model = make_pipeline(
+        TextVectorizer(),
+        DumpTrasformer(),
+        MODELS[modelname](num_states),
+    )
+    model = model.fit(words, lengths)
+    modelname = "{}.{}.{}.pkl".format(output, modelname, num_states)
+    print("Saving the model: {}".format(modelname))
+    joblib.dump(model, modelname)
