@@ -1,6 +1,7 @@
 import click
 import sys
 import numpy as np
+from datetime import datetime
 
 import joblib
 from sklearn.preprocessing import LabelEncoder
@@ -89,7 +90,7 @@ MODELS = {
 )
 @click.option('--output', '-o', default="artifacts/")
 @click.option('--inputs', default=sys.stdin, required=True)
-def main(modelname, num_states, output, inputs):
+def train(modelname, num_states, output, inputs):
     np.random.seed(seed=None)
     lines = [line.split() for line in inputs]
     words = [word.lower() for line in lines for word in line]
@@ -104,3 +105,17 @@ def main(modelname, num_states, output, inputs):
     modelname = "{}.{}.{}.pkl".format(output, modelname, num_states)
     print("Saving the model: {}".format(modelname))
     joblib.dump(model, modelname)
+
+
+@click.command()
+@click.option('--num-lines', '-l', default=20, type=int)
+@click.option('--num-words', '-w', default=10, type=int)
+@click.option('--seed', type=int, default=datetime.now().microsecond)
+@click.option('--filename', type=str, required=True)
+def generate(num_lines, num_words, seed, filename):
+    model = joblib.load(filename)
+    sentence_sizes = [(num_words, seed)] * num_lines
+    output = model.inverse_transform(sentence_sizes)
+    print("Generated text:")
+    print("\n".join(output))
+    print("seed={0}".format(seed))

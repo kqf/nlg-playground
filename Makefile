@@ -1,16 +1,16 @@
 dataset = data/input-test.txt
-model = artifacts/hmm.builtin.9.pkl
+size = 12
+model = artifacts/hmm.builtin.$(size).pkl
 
 data $(dataset): model/dataset.py
 	python model/dataset.py
 
 train $(model): $(dataset)
 	@-mkdir artifacts
-	train -n 9 -o artifacts/hmm < $(dataset)
+	nlg-train -n $(size) -o artifacts/hmm < $(dataset)
 
 generate: $(model) 
-# 	echo "skipping the generation"
-	python model/generate.py -l 20 -w 12 $(model)
+	nlg-generate -w 10 --filename $(model)
 # 	python model/freq.py -l 20 -w 12 artifacts/hmm.builtin.8.freqdist artifacts/hmm.builtin.8.le
 # 	python model/rnd.py -l 20 -w 12 artifacts/hmm.builtin.8.le
 

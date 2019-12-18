@@ -6,7 +6,8 @@ setup(
     packages=find_packages(),
     entry_points={
         'console_scripts': [
-            'train=model.train:main',
+            'nlg-train=model.main:train',
+            'nlg-generate=model.main:generate',
         ],
     },
 )
