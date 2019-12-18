@@ -1,8 +1,7 @@
-import argparse
 import sys
-import numpy as np
+import argparse
+import joblib
 from datetime import datetime
-from sklearn.externals import joblib
 
 
 def main():
@@ -15,20 +14,10 @@ def main():
     args.add_argument("filename", help="input filename")
     args = args.parse_args()
     model = joblib.load(args.filename)
-    seed = args.seed
-    for _i in range(args.num_lines):
-        random_len = args.num_words
-        seed = seed + 1
-
-        symbols, _states = model.named_steps["multinomialhmm"].sample(
-            random_len, random_state=seed)
-
-        le = model.named_steps["textvectorizer"].le
-        output = le.inverse_transform(np.squeeze(symbols))
-        for word in output:
-            print(word, end=" ")
-        print()
-
+    sentence_sizes = [(args.num_words, args.seed)] * args.num_lines
+    output = model.inverse_transform(sentence_sizes)
+    print("Generated text:")
+    print("\n".join(output))
     print("seed={0}".format(args.seed), file=sys.stderr)
 
 

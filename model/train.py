@@ -26,6 +26,12 @@ class TextVectorizer(BaseEstimator, TransformerMixin):
             np.fromiter(self.le.transform(X), np.int64)).T
         return labels
 
+    def inverse_transform(self, X):
+        output = []
+        for sentence in X:
+            output.append(" ".join(self.le.inverse_transform(sentence)))
+        return output
+
 
 class DumpTrasformer(BaseEstimator, TransformerMixin):
     def fit(self, X, y=None):
@@ -35,24 +41,25 @@ class DumpTrasformer(BaseEstimator, TransformerMixin):
         print("The dataset shape", X.shape)
         return X
 
+    def inverse_transform(self, X):
+        return X
 
-def warn(msg):
-    print(msg, file=sys.stderr)
 
-
-def outfile(output, model, num_states, ext):
-    return "{name}.{model}.{n}.{ext}".format(
-        name=output, model=model, n=num_states, ext=ext)
+class HMMTransformer(hmm.MultinomialHMM):
+    def inverse_transform(self, X):
+        output = []
+        for i, (seqsize, seed) in enumerate(X):
+            symbols, _states = self.sample(seqsize, random_state=seed + i)
+            output.append(np.squeeze(symbols))
+        return output
 
 
 def builtin(num_states):
-    warn("Initial parameter estimation using built-in method")
     model = hmm.MultinomialHMM(n_components=num_states, init_params='ste')
     return model
 
 
 def frequencies(fd, alphabet, num_states):
-    warn("Initial parameter estimation using relative frequencies")
 
     frequencies = np.fromiter(
         (fd.freq(i)
@@ -84,7 +91,6 @@ MODELS = {
 @click.option('--inputs', default=sys.stdin, required=True)
 def main(modelname, num_states, output, inputs):
     np.random.seed(seed=None)
-    # args = args.parse_args()
     lines = [line.split() for line in inputs]
     words = [word.lower() for line in lines for word in line]
     lengths = [len(line) for line in lines]
@@ -92,7 +98,7 @@ def main(modelname, num_states, output, inputs):
     model = make_pipeline(
         TextVectorizer(),
         DumpTrasformer(),
-        MODELS[modelname](num_states),
+        HMMTransformer(n_components=num_states, init_params='ste'),
     )
     model = model.fit(words, lengths)
     modelname = "{}.{}.{}.pkl".format(output, modelname, num_states)

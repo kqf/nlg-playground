@@ -13,4 +13,4 @@ def data():
 def test_text_transformation(data):
     lines = [line.split() for line in data]
     words = [word.lower() for line in lines for word in line]
-    print(TextVectorizer().fit_transform(data))
+    assert len(TextVectorizer().fit_transform(words)) == 10
