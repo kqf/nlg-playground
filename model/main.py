@@ -14,12 +14,9 @@ from nltk import FreqDist
 class TextVectorizer(BaseEstimator, TransformerMixin):
     def __init__(self):
         self.le = LabelEncoder()
-        self.fd = None
 
     def fit(self, X, y=None):
-        self.le = LabelEncoder()
         self.le.fit(list(set(X)))
-        self.fd = FreqDist(self.le.transform(X))
         return self
 
     def transform(self, X):
@@ -47,10 +44,28 @@ class DumpTrasformer(BaseEstimator, TransformerMixin):
 
 
 class HMMTransformer(hmm.MultinomialHMM):
+    def __init__(self, *args, **kwargs):
+        super(HMMTransformer, self).__init__(*args, **kwargs)
+        self.fd_ = None
+        self.sampling_method = "hmm"
+
+    def fit(self, X, y, **kwargs):
+        self.fd_ = FreqDist(X.reshape(-1))
+        super(HMMTransformer, self).fit(X, y, **kwargs)
+        return self
+
     def inverse_transform(self, X):
         output = []
+        keys, probs = zip(*((k, self.fd_.freq(k)) for k in self.fd_.keys()))
         for i, (seqsize, seed) in enumerate(X):
-            symbols, _states = self.sample(seqsize, random_state=seed + i)
+            if self.sampling_method == 'hmm':
+                symbols, _states = self.sample(seqsize, random_state=seed + i)
+            elif self.sampling_method == "freq":
+                symbols = np.random.choice(keys, size=seqsize, p=probs)
+            elif self.sampling_method == "random":
+                symbols = np.random.choice(keys, size=seqsize)
+            else:
+                raise IOError("No such sampling method", self.sampling_method)
             output.append(np.squeeze(symbols))
         return output
 
@@ -117,10 +132,12 @@ def train(modelname, num_states, output, inputs):
 @click.option('--num-lines', '-l', default=20, type=int)
 @click.option('--num-words', '-w', default=10, type=int)
 @click.option('--seed', type=int, default=datetime.now().microsecond)
+@click.option('--method', '-m', default="hmm", type=str)
 @click.option('--filename', type=str, required=True)
-def generate(num_lines, num_words, seed, filename):
+def generate(num_lines, num_words, seed, method, filename):
     model = joblib.load(filename)
     sentence_sizes = [(num_words, seed)] * num_lines
+    model.named_steps["hmmtransformer"].sampling_method = method
     output = model.inverse_transform(sentence_sizes)
     print("Generated text:")
     print("\n".join(output))

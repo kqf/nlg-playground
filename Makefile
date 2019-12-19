@@ -4,8 +4,8 @@ model = artifacts/hmm.builtin.$(size).pkl
 
 generate: $(model) 
 	nlg-generate -w 10 --filename $(model)
-# 	python model/freq.py -l 20 -w 12 artifacts/hmm.builtin.8.freqdist artifacts/hmm.builtin.8.le
-# 	python model/rnd.py -l 20 -w 12 artifacts/hmm.builtin.8.le
+	nlg-generate -w 10 --filename $(model) -m freq
+	nlg-generate -w 10 --filename $(model) -m random
 
 data $(dataset): model/dataset.py
 	python model/dataset.py
