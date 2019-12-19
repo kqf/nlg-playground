@@ -96,14 +96,20 @@ def train(modelname, num_states, output, inputs):
     words = [word.lower() for line in lines for word in line]
     lengths = [len(line) for line in lines]
 
+    params = {
+        "n_components": num_states,
+        "init_params": "ste",
+        "verbose": True,
+    }
+
     model = make_pipeline(
         TextVectorizer(),
         DumpTrasformer(),
-        HMMTransformer(n_components=num_states, init_params='ste'),
+        HMMTransformer(**params),
     )
-    model = model.fit(words, lengths)
+    model.fit(words, lengths)
     modelname = "{}.{}.{}.pkl".format(output, modelname, num_states)
-    print("Saving the model: {}".format(modelname))
+    print("Saving the model to {}".format(modelname))
     joblib.dump(model, modelname)
 
 

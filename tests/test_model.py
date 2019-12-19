@@ -1,5 +1,5 @@
 import pytest
-from model.train import TextVectorizer
+from model.main import TextVectorizer
 
 
 @pytest.fixture
