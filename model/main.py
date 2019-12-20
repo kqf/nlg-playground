@@ -31,7 +31,7 @@ class TextVectorizer(BaseEstimator, TransformerMixin):
         return output
 
 
-class DumpTrasformer(BaseEstimator, TransformerMixin):
+class DebugTrasformer(BaseEstimator, TransformerMixin):
     def fit(self, X, y=None):
         return self
 
@@ -70,39 +70,9 @@ class HMMTransformer(hmm.MultinomialHMM):
         return output
 
 
-def builtin(num_states):
-    model = hmm.MultinomialHMM(n_components=num_states, init_params='ste')
-    return model
-
-
-def frequencies(fd, alphabet, num_states):
-
-    frequencies = np.fromiter(
-        (fd.freq(i)
-         for i in range(len(alphabet))), dtype=np.float64)
-    emission_prob = np.stack([frequencies] * num_states)
-    model = hmm.MultinomialHMM(n_components=num_states, init_params='st')
-    model.emissionprob_ = emission_prob
-    return model
-
-
-def flat():
-    return None
-
-
-MODELS = {
-    "builtin": builtin,
-    "freq": frequencies,
-    "flat": flat,
-}
-
-
 @click.command()
 @click.option('--num-states', '-n', default=1, type=int)
-@click.option(
-    '--modelname', '-m', default='builtin',
-    type=click.Choice(list(MODELS.keys())),
-)
+@click.option('--modelname', '-m', default='builtin', type=str)
 @click.option('--output', '-o', default="artifacts/")
 @click.option('--inputs', default=sys.stdin, required=True)
 def train(modelname, num_states, output, inputs):
@@ -113,13 +83,13 @@ def train(modelname, num_states, output, inputs):
 
     params = {
         "n_components": num_states,
-        "init_params": "ste",
+        "init_params": "st",
         "verbose": True,
     }
 
     model = make_pipeline(
         TextVectorizer(),
-        DumpTrasformer(),
+        DebugTrasformer(),
         HMMTransformer(**params),
     )
     model.fit(words, lengths)
@@ -129,7 +99,7 @@ def train(modelname, num_states, output, inputs):
 
 
 @click.command()
-@click.option('--num-lines', '-l', default=20, type=int)
+@click.option('--num-lines', '-l', default=10, type=int)
 @click.option('--num-words', '-w', default=10, type=int)
 @click.option('--seed', type=int, default=datetime.now().microsecond)
 @click.option('--method', '-m', default="hmm", type=str)
