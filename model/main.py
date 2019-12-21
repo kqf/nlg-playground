@@ -72,10 +72,9 @@ class HMMTransformer(hmm.MultinomialHMM):
 
 @click.command()
 @click.option('--num-states', '-n', default=1, type=int)
-@click.option('--modelname', '-m', default='builtin', type=str)
 @click.option('--output', '-o', default="artifacts/")
 @click.option('--inputs', default=sys.stdin, required=True)
-def train(modelname, num_states, output, inputs):
+def train(num_states, output, inputs):
     np.random.seed(seed=None)
     lines = [line.split() for line in inputs]
     words = [word.lower() for line in lines for word in line]
@@ -83,7 +82,7 @@ def train(modelname, num_states, output, inputs):
 
     params = {
         "n_components": num_states,
-        "init_params": "st",
+        "init_params": "ste",
         "verbose": True,
     }
 
@@ -93,9 +92,8 @@ def train(modelname, num_states, output, inputs):
         HMMTransformer(**params),
     )
     model.fit(words, lengths)
-    modelname = "{}.{}.{}.pkl".format(output, modelname, num_states)
-    print("Saving the model to {}".format(modelname))
-    joblib.dump(model, modelname)
+    print("Saving the model to {}".format(output))
+    joblib.dump(model, output)
 
 
 @click.command()
