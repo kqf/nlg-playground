@@ -51,12 +51,17 @@ class HMMTransformer(hmm.MultinomialHMM):
 
     def fit(self, X, y, **kwargs):
         self.fd_ = FreqDist(X.reshape(-1))
+        if 'e' not in self.init_params.lower():
+            probs = np.fromiter(self.fd_.values(), dtype=np.float)
+            self.emissionprob_ = np.broadcast_to(
+                probs / np.sum(probs),
+                (self.n_components, len(probs)))
         super(HMMTransformer, self).fit(X, y, **kwargs)
         return self
 
     def inverse_transform(self, X):
         output = []
-        keys, probs = zip(*((k, self.fd_.freq(k)) for k in self.fd_.keys()))
+        keys, probs = zip(*self.fd_.items())
         for i, (seqsize, seed) in enumerate(X):
             if self.sampling_method == 'hmm':
                 symbols, _states = self.sample(seqsize, random_state=seed + i)
@@ -82,7 +87,7 @@ def train(num_states, output, inputs):
 
     params = {
         "n_components": num_states,
-        "init_params": "ste",
+        "init_params": "st",
         "verbose": True,
     }
 
