@@ -8,6 +8,11 @@ def target_idx(data, target_name):
     return contants.index(target_name)
 
 
+def dt_groups(df, col, interval='30m'):
+    na = pd.Timedelta(seconds=0)
+    return (df[col].diff().fillna(na) >= interval).cumsum()
+
+
 def main():
     env = Env()
     env.read_env()
