@@ -116,3 +116,17 @@ def generate(num_lines, num_words, seed, method, filename):
     print("Generated text:")
     print("\n".join(output))
     print("seed={0}".format(seed))
+
+
+@click.command()
+@click.option('--filename', type=str, required=True)
+@click.option('--inputs', default=sys.stdin, required=True)
+def dialogue(filename, inputs):
+    lines = [line.split() for line in inputs]
+    words = [word.lower() for line in lines for word in line]
+    lengths = [len(line) for line in lines]
+    model = joblib.load(filename)
+
+    preds = np.squeeze(model.predict(words, lengths=lengths))
+    print(preds)
+    print(model.named_steps["textvectorizer"].le.inverse_transform(preds))

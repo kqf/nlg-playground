@@ -8,6 +8,7 @@ setup(
         'console_scripts': [
             'nlg-train=model.main:train',
             'nlg-generate=model.main:generate',
+            'nlg-dialogue=model.main:dialogue',
         ],
     },
 )
