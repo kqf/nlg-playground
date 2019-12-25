@@ -28,9 +28,10 @@ def main():
     df = df[df["text"].astype(bool)]
     df = df[~df["text"].str.contains(r"\[{'").astype(bool)]
     df["text"] = df["text"].str.strip()
-    print(df["text"].head(5))
-    # from IPython import embed; embed()
-    df["text"].to_csv("data/input.txt", header=False, index=False, sep="@")
+    df["date"] = df["date"].astype("datetime64")
+    messages = df.groupby(dt_groups(df, "date"))["text"].apply(". ".join)
+    print(messages.head(5))
+    messages.to_csv("data/input.txt", header=False, index=False, sep="@")
 
 
 if __name__ == '__main__':

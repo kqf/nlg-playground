@@ -1,5 +1,5 @@
 dataset = data/input-test.txt
-size = 6
+size = 12
 model = artifacts/hmm.$(subst /,.,$(dataset)).n-components.$(size).pkl
 
 generate: $(model) 
@@ -11,7 +11,7 @@ data $(dataset): model/dataset.py
 	python model/dataset.py
 
 train $(model): $(dataset)
-	@-mkdir artifacts
+	-@mkdir artifacts
 	nlg-train -n $(size) -o $(model) < $(dataset)
 
 clean:

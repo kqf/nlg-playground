@@ -87,7 +87,8 @@ def train(num_states, output, inputs):
 
     params = {
         "n_components": num_states,
-        "init_params": "st",
+        "init_params": "ste",
+        "n_iter": 20,
         "verbose": True,
     }
 
