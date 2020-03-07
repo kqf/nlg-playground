@@ -4,30 +4,32 @@ import numpy as np
 from datetime import datetime
 
 import joblib
-from sklearn.preprocessing import LabelEncoder
+# from sklearn.preprocessing import LabelEncoder
+from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.pipeline import make_pipeline
 from sklearn.base import BaseEstimator, TransformerMixin
 from hmmlearn import hmm
-from nltk import FreqDist
+# from nltk import FreqDisd
 
 
 class TextVectorizer(BaseEstimator, TransformerMixin):
     def __init__(self):
-        self.le = LabelEncoder()
+        self.le = CountVectorizer(min_df=0, analyzer="char")
 
     def fit(self, X, y=None):
-        self.le.fit(list(set(X)))
+        corpus = ["".join(chars) for chars in X]
+        self.le.fit(corpus)
         return self
 
     def transform(self, X):
-        labels = np.atleast_2d(
-            np.fromiter(self.le.transform(X), np.int64)).T
-        return labels
+        return np.vstack([self.le.transform(w).todense() for w in X])
 
     def inverse_transform(self, X):
         output = []
         for sentence in X:
-            output.append(" ".join(self.le.inverse_transform(sentence)))
+            output.append("".join(
+                np.concatenate(self.le.inverse_transform(sentence)))
+            )
         return output
 
 
@@ -50,7 +52,7 @@ class HMMTransformer(hmm.MultinomialHMM):
         self.sampling_method = "hmm"
 
     def fit(self, X, y, **kwargs):
-        self.fd_ = FreqDist(X.reshape(-1))
+        # self.fd_ = FreqDist(X.reshape(-1))
         if 'e' not in self.init_params.lower():
             probs = np.fromiter(self.fd_.values(), dtype=np.float)
             self.emissionprob_ = np.broadcast_to(
@@ -61,18 +63,19 @@ class HMMTransformer(hmm.MultinomialHMM):
 
     def inverse_transform(self, X):
         output = []
-        keys, probs = zip(*self.fd_.items())
         for i, (seqsize, seed) in enumerate(X):
             if self.sampling_method == 'hmm':
                 symbols, _states = self.sample(seqsize, random_state=seed + i)
             elif self.sampling_method == "freq":
+                keys, probs = zip(*self.fd_.items())
                 symbols = np.random.choice(keys, size=seqsize, p=probs)
             elif self.sampling_method == "random":
+                keys, probs = zip(*self.fd_.items())
                 symbols = np.random.choice(keys, size=seqsize)
             else:
                 raise IOError("No such sampling method", self.sampling_method)
             output.append(np.squeeze(symbols))
-        return output
+        return np.array(output)
 
 
 @click.command()
@@ -81,9 +84,9 @@ class HMMTransformer(hmm.MultinomialHMM):
 @click.option('--inputs', default=sys.stdin, required=True)
 def train(num_states, output, inputs):
     np.random.seed(seed=None)
-    lines = [line.split() for line in inputs]
-    words = [word.lower() for line in lines for word in line]
+    lines = [list(line) for line in inputs]
     lengths = [len(line) for line in lines]
+    print(lines, lengths)
 
     params = {
         "n_components": num_states,
@@ -97,7 +100,7 @@ def train(num_states, output, inputs):
         DebugTrasformer(),
         HMMTransformer(**params),
     )
-    model.fit(words, lengths)
+    model.fit(lines, lengths)
     print("Saving the model to {}".format(output))
     joblib.dump(model, output)
 
@@ -122,11 +125,10 @@ def generate(num_lines, num_words, seed, method, filename):
 @click.option('--filename', type=str, required=True)
 @click.option('--inputs', default=sys.stdin, required=True)
 def dialogue(filename, inputs):
-    lines = [line.split() for line in inputs]
-    words = [word.lower() for line in lines for word in line]
+    lines = [line.lower() for line in inputs]
     lengths = [len(line) for line in lines]
     model = joblib.load(filename)
 
-    preds = np.squeeze(model.predict(words, lengths=lengths))
+    preds = np.squeeze(model.predict(lines, lengths=lengths))
     print(preds)
     print(model.named_steps["textvectorizer"].le.inverse_transform(preds))
