@@ -11,6 +11,6 @@ def data():
 
 
 def test_text_transformation(data):
-    lines = [line.split() for line in data]
-    words = [word.lower() for line in lines for word in line]
-    assert len(TextVectorizer().fit_transform(words)) == 10
+    lines = [list(line) for line in data]
+    n_words = sum([len(line) for line in lines])
+    assert len(TextVectorizer().fit_transform(lines)) == n_words
