@@ -4,12 +4,10 @@ import numpy as np
 from datetime import datetime
 
 import joblib
-# from sklearn.preprocessing import LabelEncoder
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.pipeline import make_pipeline
 from sklearn.base import BaseEstimator, TransformerMixin
 from hmmlearn import hmm
-# from nltk import FreqDisd
 
 
 class TextVectorizer(BaseEstimator, TransformerMixin):
@@ -66,12 +64,6 @@ class HMMTransformer(hmm.MultinomialHMM):
         for i, (seqsize, seed) in enumerate(X):
             if self.sampling_method == 'hmm':
                 symbols, _states = self.sample(seqsize, random_state=seed + i)
-            elif self.sampling_method == "freq":
-                keys, probs = zip(*self.fd_.items())
-                symbols = np.random.choice(keys, size=seqsize, p=probs)
-            elif self.sampling_method == "random":
-                keys, probs = zip(*self.fd_.items())
-                symbols = np.random.choice(keys, size=seqsize)
             else:
                 raise IOError("No such sampling method", self.sampling_method)
             output.append(np.squeeze(symbols))
