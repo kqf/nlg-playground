@@ -1,19 +1,19 @@
-dataset = data/input-test.txt
+dataset = data/input.txt
 size = 10
-model = artifacts/hmm.$(subst /,.,$(dataset)).n-components.$(size).pkl
+model = artifacts/hmm.$(subst /,.,$(dataset)).n-components.$(size).json
 
 generate: $(model) 
 	nlg-generate -w 10 --filename $(model)
 
 talk: $(model)
-	nlg-dialogue --filename $(model) < data/dialogue.txt
+	nlg-dialogue --filename $(model)
 
 data $(dataset): model/dataset.py
 	nlg-dataset
 
 train $(model): $(dataset)
 	-@mkdir artifacts
-	nlg-train -n $(size) -o $(model) < $(dataset)
+	nlg-train -n $(size) -o $(model) --inputs $(dataset)
 
 clean:
 	rm -rf $(model)
