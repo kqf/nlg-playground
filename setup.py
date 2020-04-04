@@ -10,6 +10,7 @@ setup(
             'nlg-generate=model.main:generate',
             'nlg-dialogue=model.main:dialogue',
             'nlg-dataset=model.dataset:main',
+            'oleg=bot.run:main',
         ],
     },
 )
