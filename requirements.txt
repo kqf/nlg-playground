@@ -6,3 +6,4 @@ numpy
 environs
 ipython
 markovify
+python-telegram-bot
