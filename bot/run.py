@@ -1,6 +1,7 @@
 import json
 import logging
 import markovify
+
 from functools import partial
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from environs import Env
@@ -31,11 +32,12 @@ def help(update, context):
 
 def reply(update, context, model):
     """reply the user message."""
-    logger.warning(f'Message {update.message.text}')
+    uname = update.message.from_user.username
+    logger.info(f'Message from {uname}: {update.message.text}')
     message = ""
     while not message:
         message = model.make_sentence()
-    logger.warning(f'Response {message}')
+    logger.info(f'Response to {uname}: {message}')
     update.message.reply_text(message)
 
 
@@ -47,7 +49,6 @@ def error(update, context):
 def main():
     with open(MODEL_NAME, encoding='utf-8') as f:
         model = markovify.Text.from_json(json.load(f))
-    print(model.make_sentence())
 
     updater = Updater(TOKEN, use_context=True)
 
