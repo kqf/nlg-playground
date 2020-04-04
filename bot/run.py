@@ -1,10 +1,14 @@
+import json
 import logging
+import markovify
+from functools import partial
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from environs import Env
 
 env = Env()
 env.read_env()
 TOKEN = env("TOKEN")
+MODEL_NAME = env("MODEL")
 
 # Enable logging
 logging.basicConfig(
@@ -25,10 +29,14 @@ def help(update, context):
     update.message.reply_text('Help!')
 
 
-def echo(update, context):
-    """Echo the user message."""
+def reply(update, context, model):
+    """reply the user message."""
     logger.warning(f'Message {update.message.text}')
-    update.message.reply_text(update.message.text)
+    message = ""
+    while not message:
+        message = model.make_sentence()
+    logger.warning(f'Response {message}')
+    update.message.reply_text(message)
 
 
 def error(update, context):
@@ -37,6 +45,10 @@ def error(update, context):
 
 
 def main():
+    with open(MODEL_NAME, encoding='utf-8') as f:
+        model = markovify.Text.from_json(json.load(f))
+    print(model.make_sentence())
+
     updater = Updater(TOKEN, use_context=True)
 
     # Get the dispatcher to register handlers
@@ -46,8 +58,8 @@ def main():
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help))
 
-    # on noncommand i.e message - echo the message on Telegram
-    dp.add_handler(MessageHandler(Filters.text, echo))
+    # on noncommand i.e message - reply the message on Telegram
+    dp.add_handler(MessageHandler(Filters.text, partial(reply, model=model)))
 
     # log all errors
     dp.add_error_handler(error)
