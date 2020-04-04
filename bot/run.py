@@ -8,8 +8,11 @@ from environs import Env
 
 env = Env()
 env.read_env()
+
 TOKEN = env("TOKEN")
 MODEL_NAME = env("MODEL")
+MESSAGE_START = env("MESSAGE_START")
+MESSAGE_HELP = env("MESSAGE_HELP")
 
 # Enable logging
 logging.basicConfig(
@@ -22,22 +25,22 @@ logger = logging.getLogger(__name__)
 
 def start(update, context):
     """Send a message when the command /start is issued."""
-    update.message.reply_text('Hi!')
+    update.message.reply_text(MESSAGE_START)
 
 
 def help(update, context):
     """Send a message when the command /help is issued."""
-    update.message.reply_text('Help!')
+    update.message.reply_text(MESSAGE_HELP)
 
 
 def reply(update, context, model):
     """reply the user message."""
     uname = update.message.from_user.username
-    logger.info(f'Message from {uname}: {update.message.text}')
+    logger.info(f'Message from @{uname}: {update.message.text}')
     message = ""
     while not message:
         message = model.make_sentence()
-    logger.info(f'Response to {uname}: {message}')
+    logger.info(f'Response to @{uname}: {message}')
     update.message.reply_text(message)
 
 
