@@ -1,3 +1,4 @@
+rawdata = data/raw.json
 dataset = data/input.txt
 size = 10
 model = artifacts/hmm.$(subst /,.,$(dataset)).n-components.$(size).json
@@ -9,7 +10,7 @@ talk: $(model)
 	nlg-dialogue --filename $(model)
 
 data $(dataset): model/dataset.py
-	nlg-dataset
+	nlg-dataset --ifile $(rawdata) --ofile $(dataset)
 
 train $(model): $(dataset)
 	-@mkdir artifacts

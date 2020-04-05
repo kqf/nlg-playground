@@ -1,11 +1,16 @@
+import click
 import json
 import pandas as pd
 from environs import Env
 
 
-def target_idx(data, target_name):
+def read_raw_export(filename, target_name):
+    with open(filename) as f:
+        data = json.load(f)
+
     contants = [x["name"] for x in data["frequent_contacts"]["list"]]
-    return contants.index(target_name)
+    idx = contants.index(target_name)
+    return pd.DataFrame(data["chats"]["list"][idx]["messages"])
 
 
 def dt_groups(df, col, interval='30m'):
@@ -13,16 +18,15 @@ def dt_groups(df, col, interval='30m'):
     return (df[col].diff().fillna(na) >= interval).cumsum()
 
 
-def main():
+@click.command()
+@click.option('--ifile', type=str, required=True)
+@click.option('--ofile', type=str, required=True)
+def main(ifile, ofile):
     env = Env()
     env.read_env()
     target_name = env("TARGET_NAME")
+    df = read_raw_export(ifile, target_name)
 
-    with open("data/result.json") as f:
-        data = json.load(f)
-
-    idx = target_idx(data, target_name)
-    df = pd.DataFrame(data["chats"]["list"][idx]["messages"])
     df = df[df["from"] == target_name].reset_index()
     df["text"] = df["text"].str.replace('\n', ' ')
     df = df[df["text"].astype(bool)]
@@ -32,7 +36,7 @@ def main():
     # messages = df.groupby(dt_groups(df, "date"))["text"].apply(" ".join)
     messages = df["text"]
     print(messages.head(5))
-    messages.to_csv("data/input.txt", header=False, index=False, sep="@")
+    messages.to_csv(ofile, header=False, index=False, sep="@")
 
 
 if __name__ == '__main__':
