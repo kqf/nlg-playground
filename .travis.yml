@@ -9,4 +9,3 @@ install:
 # Trains and generates the output
 script:
   - pytest -s tests
-  - make generate
