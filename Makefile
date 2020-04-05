@@ -1,7 +1,6 @@
-rawdata = data/raw.json
+rawdata = data/result.json
 dataset = data/input.txt
-size = 10
-model = artifacts/hmm.$(subst /,.,$(dataset)).n-components.$(size).json
+model = artifacts/hmm.$(subst /,.,$(dataset)).json
 
 generate: $(model) 
 	nlg-generate -w 10 --filename $(model)
@@ -14,7 +13,7 @@ data $(dataset): model/dataset.py
 
 train $(model): $(dataset)
 	-@mkdir artifacts
-	nlg-train -n $(size) -o $(model) --inputs $(dataset)
+	nlg-train -o $(model) --inputs $(dataset)
 
 clean:
 	rm -rf $(model)

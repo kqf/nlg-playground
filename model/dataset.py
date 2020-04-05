@@ -25,7 +25,7 @@ def main(ifile, ofile):
     env = Env()
     env.read_env()
     target_name = env("TARGET_NAME")
-    df = read_raw_export(ifile, target_name)
+    df = pd.read_json(ifile)
 
     df = df[df["from"] == target_name].reset_index()
     df["text"] = df["text"].str.replace('\n', ' ')

@@ -1,14 +1,14 @@
 import json
 import click
-from datetime import datetime
 import markovify
+
+from datetime import datetime
 
 
 @click.command()
-@click.option('--num-states', '-n', default=1, type=int)
 @click.option('--output', '-o', default="artifacts/")
 @click.option('--inputs', required=True)
-def train(num_states, output, inputs):
+def train(output, inputs):
     # Get raw text as string.
     with open(inputs) as f:
         text = f.read()
