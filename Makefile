@@ -1,4 +1,4 @@
-rawdata = data/result.json
+rawdata = data/newest.json
 dataset = data/input.txt
 model = artifacts/hmm.$(subst /,.,$(dataset)).json
 
@@ -8,7 +8,10 @@ generate: $(model)
 talk: $(model)
 	nlg-dialogue --filename $(model)
 
-data $(dataset): model/dataset.py
+$(rawdata):
+	nlg-raw-data --ofile $(rawdata)
+
+data $(dataset): model/dataset.py $(rawdata)
 	nlg-dataset --ifile $(rawdata) --ofile $(dataset)
 
 train $(model): $(dataset)

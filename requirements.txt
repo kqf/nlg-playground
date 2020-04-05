@@ -7,3 +7,5 @@ environs
 ipython
 markovify
 python-telegram-bot
+telethon
+tqdm
