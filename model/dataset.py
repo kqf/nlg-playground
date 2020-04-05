@@ -10,13 +10,6 @@ from telethon.sync import TelegramClient
 env = Env()
 env.read_env()
 
-API_ID = env("API_ID")
-API_HASH = env("API_HASH")
-TARGET_NAME = env("TARGET_NAME")
-TARGET_UNAME = env("TARGET_UNAME")
-# Limit the query, otherwise it will take ages
-MESSAGE_LIMIT = env.int("MESSAGE_LIMIT")
-
 
 def payload(client, message):
     return {
@@ -29,12 +22,13 @@ def payload(client, message):
 @click.command()
 @click.option('--ofile', type=str, required=True)
 def download(ofile):
+    target_uname, limit = env("TARGET_UNAME"), env.int("MESSAGE_LIMIT")
     messages = []
-    with TelegramClient("download", API_ID, API_HASH) as client:
+    with TelegramClient("download", env("API_ID"), env("API_HASH")) as client:
         pool = tqdm.tqdm(
-            client.iter_messages(TARGET_UNAME, limit=MESSAGE_LIMIT),
-            # total=client.get_messages(TARGET_UNAME)[0].id
-            total=MESSAGE_LIMIT
+            client.iter_messages(target_uname, limit=limit),
+            # total=client.get_messages(target_uname)[0].id
+            total=limit
         )
         for msg in pool:
             messages.append(payload(client, msg))
@@ -63,7 +57,7 @@ def dt_groups(df, col, interval='30m'):
 def main(ifile, ofile):
     df = pd.read_json(ifile)
 
-    df = df[df["from"] == TARGET_NAME].reset_index()
+    df = df[df["from"] == env("TARGET_NAME")].reset_index()
     df["text"] = df["text"].str.replace('\n', ' ')
     df = df[df["text"].astype(bool)]
     df = df[~df["text"].str.contains(r"\[{'").astype(bool)]
