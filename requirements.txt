@@ -9,3 +9,4 @@ markovify
 python-telegram-bot
 telethon
 tqdm
+mega.py

@@ -1,3 +1,4 @@
+import os
 import json
 import logging
 import markovify
@@ -5,6 +6,7 @@ import markovify
 from functools import partial
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from environs import Env
+from mega import Mega
 
 env = Env()
 env.read_env()
@@ -24,9 +26,13 @@ logger = logging.getLogger(__name__)
 
 
 class ReplyBot:
-    def __init__(self, filename):
+    def __init__(self, filename, model_url):
         self.model = None
         try:
+            if model_url:
+                filename = Mega().download_url(
+                    model_url,
+                    os.path.dirname(filename))
             with open(filename, encoding='utf-8') as f:
                 self.model = markovify.Text.from_json(json.load(f))
         except FileNotFoundError:
@@ -77,7 +83,7 @@ def main():
     dp.add_handler(CommandHandler("help", help))
 
     # on noncommand i.e message - reply the message on Telegram
-    bot = ReplyBot(MODEL_NAME)
+    bot = ReplyBot(MODEL_NAME, env.str("MODEL_URL", ""))
     dp.add_handler(MessageHandler(Filters.text, partial(reply, model=bot)))
 
     # log all errors
