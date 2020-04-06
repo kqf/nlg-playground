@@ -23,6 +23,25 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
+class ReplyBot:
+    def __init__(self, filename):
+        self.model = None
+        try:
+            with open(filename, encoding='utf-8') as f:
+                self.model = markovify.Text.from_json(json.load(f))
+        except FileNotFoundError:
+            logger.error(f"Model file {filename} is missing.")
+
+    def reply(self):
+        if self.model is None:
+            return env("MESSAGE_DEFAULT")
+
+        message = None
+        while not message:
+            message = self.model.make_sentence()
+        return message
+
+
 def start(update, context):
     """Send a message when the command /start is issued."""
     update.message.reply_text(MESSAGE_START)
@@ -37,9 +56,7 @@ def reply(update, context, model):
     """reply the user message."""
     uname = update.message.from_user.username
     logger.info(f'Message from @{uname}: {update.message.text}')
-    message = ""
-    while not message:
-        message = model.make_sentence()
+    message = model.reply()
     logger.info(f'Response to @{uname}: {message}')
     update.message.reply_text(message)
 
@@ -50,9 +67,6 @@ def error(update, context):
 
 
 def main():
-    with open(MODEL_NAME, encoding='utf-8') as f:
-        model = markovify.Text.from_json(json.load(f))
-
     updater = Updater(TOKEN, use_context=True)
 
     # Get the dispatcher to register handlers
@@ -63,7 +77,8 @@ def main():
     dp.add_handler(CommandHandler("help", help))
 
     # on noncommand i.e message - reply the message on Telegram
-    dp.add_handler(MessageHandler(Filters.text, partial(reply, model=model)))
+    bot = ReplyBot(MODEL_NAME)
+    dp.add_handler(MessageHandler(Filters.text, partial(reply, model=bot)))
 
     # log all errors
     dp.add_error_handler(error)
