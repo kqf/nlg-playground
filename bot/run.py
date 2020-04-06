@@ -83,8 +83,20 @@ def main():
     # log all errors
     dp.add_error_handler(error)
 
-    # Start the Bot
-    updater.start_polling()
+    # if not set, run in debug mode
+    webhook_url = env.str("WEBHOOK_URL", "")
+
+    if not webhook_url:
+        updater.start_polling()
+        updater.idle()
+        return
+
+    updater.start_webhook(
+        listen="0.0.0.0",
+        port=env.int("PORT", '8443'),
+        url_path=TOKEN
+    )
+    updater.bot.set_webhook(f"{webhook_url}/{TOKEN}")
     updater.idle()
 
 
