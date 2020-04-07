@@ -13,6 +13,7 @@ MODEL_NAME = env("MODEL")
 MESSAGE_START = env("MESSAGE_START")
 MESSAGE_HELP = env("MESSAGE_HELP")
 MESSAGE_VERSION = env("MESSAGE_VERSION")
+MESSAGE_ABOUT = env("MESSAGE_ABOUT")
 
 # Enable logging
 logging.basicConfig(
@@ -35,6 +36,10 @@ def help(update, context):
 
 def version(update, context):
     update.message.reply_text(MESSAGE_VERSION)
+
+
+def about(update, context):
+    update.message.reply_text(MESSAGE_ABOUT)
 
 
 def reply(update, context, model):
@@ -62,6 +67,7 @@ def main():
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help))
     dp.add_handler(CommandHandler("version", version))
+    dp.add_handler(CommandHandler("about", about))
 
     # on noncommand i.e message - reply the message on Telegram
     bot = ReplyBot(MODEL_NAME, env.str("MODEL_URL", ""))
