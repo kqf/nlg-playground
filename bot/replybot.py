@@ -1,8 +1,10 @@
+import random
 import logging
 import os
 import json
 import markovify
 
+from collections import defaultdict
 from mega import Mega
 from environs import Env
 
@@ -10,6 +12,36 @@ logger = logging.getLogger(__name__)
 
 env = Env()
 env.read_env()
+
+
+def from_env(sample):
+    tokens = sample.split()
+    return " ".join(random.sample(tokens, random.randint(0, len(tokens))))
+
+
+def lenglth_handler(update, context, history):
+    msg = history[-1]
+    if len(msg) < 3 and msg not in env.str("HANDLER_BIGRAMS").split():
+        return from_env(env.str("HANDLER_LENGTH"))
+    return None
+
+
+def repetition_handler(update, context, history):
+    if len(history) > 1 and history[-1] == history[-2]:
+        return ""
+    return None
+
+
+def heuristics(update, context, history):
+    handlers = [
+        repetition_handler,
+        lenglth_handler,
+    ]
+    for handler in handlers:
+        message = handler(update, context, history)
+        if message is not None:
+            return message
+    return None
 
 
 class ReplyBot:
@@ -21,6 +53,7 @@ class ReplyBot:
                 self.model = markovify.Text.from_json(json.load(f))
         except FileNotFoundError:
             logger.error(f"Model file {filename} is missing.")
+        self.history = defaultdict(list)
 
     @staticmethod
     def _download(filename, model_url):
@@ -29,7 +62,14 @@ class ReplyBot:
         # This is a drity hack to avoid problems with ephemeral file systems
         return Mega().download_url(model_url, os.path.dirname(filename))
 
-    def reply(self, context, user):
+    def reply(self, update, context):
+        uid = update.message.from_user.id
+        self.history[uid].append(update.message.text.lower())
+
+        error_answer = heuristics(update, context, self.history[uid])
+        if error_answer is not None:
+            return error_answer
+
         if self.model is None:
             return env("MESSAGE_DEFAULT")
 

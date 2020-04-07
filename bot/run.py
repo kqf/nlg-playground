@@ -43,7 +43,8 @@ def reply(update, context, model):
     logger.info(f'Message from @{uname}: {update.message.text}')
     message = model.reply(update, context)
     logger.info(f'Response to @{uname}: {message}')
-    update.message.reply_text(message)
+    if message:
+        update.message.reply_text(message)
 
 
 def error(update, context):
