@@ -4,6 +4,7 @@ import os
 import json
 import markovify
 
+import numpy as np
 from collections import defaultdict
 from mega import Mega
 from environs import Env
@@ -16,7 +17,8 @@ env.read_env()
 
 def from_env(sample):
     tokens = sample.split()
-    return " ".join(random.sample(tokens, random.randint(0, len(tokens))))
+    ntokens = np.random.poisson(2)
+    return " ".join(random.sample(tokens, min(len(tokens), ntokens)))
 
 
 def lenglth_handler(update, context, history):
