@@ -75,7 +75,12 @@ class ReplyBot:
         if self.model is None:
             return env("MESSAGE_DEFAULT")
 
+        model = markovify.combine([
+            self.model,
+            markovify.Text(". ".join(self.history[uid]))
+        ], weights=[1., 2.0])
+
         message = None
         while not message:
-            message = self.model.make_sentence()
+            message = model.make_sentence()
         return message
