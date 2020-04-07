@@ -1,12 +1,9 @@
-import os
-import json
 import logging
-import markovify
 
 from functools import partial
 from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
 from environs import Env
-from mega import Mega
+from bot.replybot import ReplyBot
 
 env = Env()
 env.read_env()
@@ -15,6 +12,7 @@ TOKEN = env("TOKEN")
 MODEL_NAME = env("MODEL")
 MESSAGE_START = env("MESSAGE_START")
 MESSAGE_HELP = env("MESSAGE_HELP")
+MESSAGE_VERSION = env("MESSAGE_VERSION")
 
 # Enable logging
 logging.basicConfig(
@@ -23,29 +21,6 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger(__name__)
-
-
-class ReplyBot:
-    def __init__(self, filename, model_url):
-        self.model = None
-        try:
-            if model_url:
-                filename = Mega().download_url(
-                    model_url,
-                    os.path.dirname(filename))
-            with open(filename, encoding='utf-8') as f:
-                self.model = markovify.Text.from_json(json.load(f))
-        except FileNotFoundError:
-            logger.error(f"Model file {filename} is missing.")
-
-    def reply(self):
-        if self.model is None:
-            return env("MESSAGE_DEFAULT")
-
-        message = None
-        while not message:
-            message = self.model.make_sentence()
-        return message
 
 
 def start(update, context):
@@ -58,11 +33,15 @@ def help(update, context):
     update.message.reply_text(MESSAGE_HELP)
 
 
+def version(update, context):
+    update.message.reply_text(MESSAGE_VERSION)
+
+
 def reply(update, context, model):
     """reply the user message."""
     uname = update.message.from_user.username
     logger.info(f'Message from @{uname}: {update.message.text}')
-    message = model.reply()
+    message = model.reply(update, context)
     logger.info(f'Response to @{uname}: {message}')
     update.message.reply_text(message)
 
@@ -81,6 +60,7 @@ def main():
     # on different commands - answer in Telegram
     dp.add_handler(CommandHandler("start", start))
     dp.add_handler(CommandHandler("help", help))
+    dp.add_handler(CommandHandler("version", version))
 
     # on noncommand i.e message - reply the message on Telegram
     bot = ReplyBot(MODEL_NAME, env.str("MODEL_URL", ""))
