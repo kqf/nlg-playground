@@ -2,6 +2,7 @@ import json
 import click
 import markovify
 
+import pathlib
 from datetime import datetime
 
 
@@ -10,9 +11,7 @@ from datetime import datetime
 @click.option('--inputs', required=True)
 def train(output, inputs):
     # Get raw text as string.
-    with open(inputs) as f:
-        text = f.read()
-
+    text = pathlib.Path(inputs).read_text()
     # Build the model.
     model = markovify.NewlineText(text)
 
