@@ -29,9 +29,7 @@ def lenglth_handler(update, context, history):
 
 
 def repetition_handler(update, context, history):
-    if len(history) > 1 and history[-1] == history[-2]:
-        return ""
-    return None
+    return "" if len(history) > 1 and history[-1] == history[-2] else None
 
 
 def heuristics(update, context, history):
