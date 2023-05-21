@@ -21,7 +21,7 @@ def data(date_col):
             "2017-09-21 12:40:00",
             "2017-09-21 13:04:00",
         ]})
-    df[date_col] = df[date_col].astype("datetime64")
+    df[date_col] = df[date_col].astype("datetime64[ns]")
     return df.sort_values(date_col)
 
 
