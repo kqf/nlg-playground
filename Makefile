@@ -2,7 +2,7 @@ rawdata = data/newest.json
 dataset = data/input.txt
 model = artifacts/hmm.$(subst /,.,$(dataset)).json
 
-generate: $(model) 
+generate: $(model)
 	nlg-generate -w 10 --filename $(model)
 
 talk: $(model)

@@ -1,5 +1,6 @@
-import pytest
 import pandas as pd
+import pytest
+
 from model.dataset import dt_groups
 
 
