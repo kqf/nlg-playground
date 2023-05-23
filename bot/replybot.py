@@ -1,13 +1,13 @@
-import random
+import json
 import logging
 import os
-import json
-import markovify
-
-import numpy as np
+import random
 from collections import defaultdict
-from mega import Mega
+
+import markovify
+import numpy as np
 from environs import Env
+from mega import Mega
 
 logger = logging.getLogger(__name__)
 
@@ -49,7 +49,7 @@ class ReplyBot:
         self.model = None
         try:
             filename = self._download(filename, model_url)
-            with open(filename, encoding='utf-8') as f:
+            with open(filename, encoding="utf-8") as f:
                 self.model = markovify.Text.from_json(json.load(f))
         except FileNotFoundError:
             logger.error(f"Model file {filename} is missing.")
@@ -73,10 +73,10 @@ class ReplyBot:
         if self.model is None:
             return env("MESSAGE_DEFAULT")
 
-        model = markovify.combine([
-            self.model,
-            markovify.Text(". ".join(self.history[uid]))
-        ], weights=[1., 2.0])
+        model = markovify.combine(
+            [self.model, markovify.Text(". ".join(self.history[uid]))],
+            weights=[1.0, 2.0],
+        )
 
         message = None
         while not message:

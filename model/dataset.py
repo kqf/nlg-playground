@@ -1,11 +1,10 @@
-import click
 import json
-import tqdm
-import pandas as pd
 
+import click
+import pandas as pd
+import tqdm
 from environs import Env
 from telethon.sync import TelegramClient
-
 
 env = Env()
 env.read_env()
@@ -15,12 +14,12 @@ def payload(client, message):
     return {
         "from": client.get_entity(message.sender_id).first_name,
         "date": str(message.date),
-        "text": message.text
+        "text": message.text,
     }
 
 
 @click.command()
-@click.option('--ofile', type=str, required=True)
+@click.option("--ofile", type=str, required=True)
 def download(ofile):
     target_uname, limit = env("TARGET_UNAME"), env.int("MESSAGE_LIMIT")
     messages = []
@@ -28,7 +27,7 @@ def download(ofile):
         pool = tqdm.tqdm(
             client.iter_messages(target_uname, limit=limit),
             # total=client.get_messages(target_uname)[0].id
-            total=limit
+            total=limit,
         )
         for msg in pool:
             messages.append(payload(client, msg))
@@ -46,19 +45,19 @@ def read_raw_export(filename, target_name):
     return pd.DataFrame(data["chats"]["list"][idx]["messages"])
 
 
-def dt_groups(df, col, interval='30m'):
+def dt_groups(df, col, interval="30m"):
     na = pd.Timedelta(seconds=0)
     return (df[col].diff().fillna(na) >= interval).cumsum()
 
 
 @click.command()
-@click.option('--ifile', type=str, required=True)
-@click.option('--ofile', type=str, required=True)
+@click.option("--ifile", type=str, required=True)
+@click.option("--ofile", type=str, required=True)
 def main(ifile, ofile):
     df = pd.read_json(ifile)
 
     df = df[df["from"] == env("TARGET_NAME")].reset_index()
-    df["text"] = df["text"].str.replace('\n', ' ')
+    df["text"] = df["text"].str.replace("\n", " ")
     df = df[df["text"].astype(bool)]
     df = df[~df["text"].str.contains(r"\[{'").astype(bool)]
     df["text"] = df["text"].str.strip()

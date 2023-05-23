@@ -1,8 +1,9 @@
 import logging
-
 from functools import partial
-from telegram.ext import Updater, CommandHandler, MessageHandler, Filters
+
 from environs import Env
+from telegram.ext import CommandHandler, Filters, MessageHandler, Updater
+
 from bot.replybot import ReplyBot
 
 env = Env()
@@ -17,8 +18,8 @@ MESSAGE_ABOUT = env("MESSAGE_ABOUT")
 
 # Enable logging
 logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.INFO
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    level=logging.INFO,
 )
 
 logger = logging.getLogger(__name__)
@@ -45,16 +46,16 @@ def about(update, context):
 def reply(update, context, model):
     """reply the user message."""
     uname = update.message.from_user.username
-    logger.info(f'Message from @{uname}: {update.message.text}')
+    logger.info(f"Message from @{uname}: {update.message.text}")
     message = model.reply(update, context)
-    logger.info(f'Response to @{uname}: {message}')
+    logger.info(f"Response to @{uname}: {message}")
     if message:
         update.message.reply_text(message)
 
 
 def error(update, context):
     """Log Errors caused by Updates."""
-    logger.warning(f'Update {update} caused error {context.error}')
+    logger.warning(f"Update {update} caused error {context.error}")
 
 
 def main():
@@ -85,13 +86,11 @@ def main():
         return
 
     updater.start_webhook(
-        listen="0.0.0.0",
-        port=env.int("PORT", '8443'),
-        url_path=TOKEN
+        listen="0.0.0.0", port=env.int("PORT", "8443"), url_path=TOKEN
     )
     updater.bot.set_webhook(f"{webhook_url}/{TOKEN}")
     updater.idle()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
