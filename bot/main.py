@@ -60,7 +60,6 @@ def error(update, context):
 
 def main():
     app = Application.builder().token(TOKEN).build()
-    updater = app.updater
 
     # on different commands - answer in Telegram
     app.add_handler(CommandHandler("start", start))
@@ -79,15 +78,15 @@ def main():
     webhook_url = env.str("WEBHOOK_URL", "")
 
     if not webhook_url:
-        updater.start_polling()
-        updater.idle()
+        app.start_polling()
         return
 
-    updater.start_webhook(
-        listen="0.0.0.0", port=env.int("PORT", "8443"), url_path=TOKEN
+    app.start_webhook(
+        listen="0.0.0.0",
+        port=env.int("PORT", "8443"),
+        url_path=TOKEN,
     )
-    updater.bot.set_webhook(f"{webhook_url}/{TOKEN}")
-    updater.idle()
+    app.bot.set_webhook(f"{webhook_url}/{TOKEN}")
 
 
 if __name__ == "__main__":
