@@ -2,7 +2,7 @@ import logging
 from functools import partial
 
 from environs import Env
-from telegram.ext import CommandHandler, Filters, MessageHandler, Updater
+from telegram.ext import Application, CommandHandler, Filters, MessageHandler
 
 from bot.replybot import ReplyBot
 
@@ -59,23 +59,21 @@ def error(update, context):
 
 
 def main():
-    updater = Updater(TOKEN, use_context=True)
-
-    # Get the dispatcher to register handlers
-    dp = updater.dispatcher
+    app = Application.builder().token(TOKEN).build()
+    updater = app.updater
 
     # on different commands - answer in Telegram
-    dp.add_handler(CommandHandler("start", start))
-    dp.add_handler(CommandHandler("help", help))
-    dp.add_handler(CommandHandler("version", version))
-    dp.add_handler(CommandHandler("about", about))
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(CommandHandler("help", help))
+    app.add_handler(CommandHandler("version", version))
+    app.add_handler(CommandHandler("about", about))
 
     # on noncommand i.e message - reply the message on Telegram
     bot = ReplyBot(MODEL_NAME, env.str("MODEL_URL", ""))
-    dp.add_handler(MessageHandler(Filters.text, partial(reply, model=bot)))
+    app.add_handler(MessageHandler(Filters.text, partial(reply, model=bot)))
 
     # log all errors
-    dp.add_error_handler(error)
+    app.add_error_handler(error)
 
     # if not set, run in debug mode
     webhook_url = env.str("WEBHOOK_URL", "")
