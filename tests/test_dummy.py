@@ -14,6 +14,8 @@ from unittest.mock import patch
         "MODEL": "123",
         "MESSAGE_VERSION": "123",
         "MESSAGE_ABOUT": "msg",
+        "PORT": "123",
+        "WEBHOOK_URL": "Url",
     },
 )
 def test_imports():
