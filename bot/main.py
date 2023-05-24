@@ -2,7 +2,7 @@ import logging
 from functools import partial
 
 from environs import Env
-from telegram.ext import Application, CommandHandler, Filters, MessageHandler
+from telegram.ext import Application, CommandHandler, filters, MessageHandler
 
 from bot.replybot import ReplyBot
 
