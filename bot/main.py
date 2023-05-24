@@ -2,7 +2,7 @@ import logging
 from functools import partial
 
 from environs import Env
-from telegram.ext import Application, CommandHandler, Filters, MessageHandler
+from telegram.ext import Application, CommandHandler, MessageHandler, filters
 
 from bot.replybot import ReplyBot
 
@@ -69,7 +69,7 @@ def main():
 
     # on noncommand i.e message - reply the message on Telegram
     bot = ReplyBot(MODEL_NAME, env.str("MODEL_URL", ""))
-    app.add_handler(MessageHandler(Filters.text, partial(reply, model=bot)))
+    app.add_handler(MessageHandler(filters.TEXT, partial(reply, model=bot)))
 
     # log all errors
     app.add_error_handler(error)
