@@ -16,6 +16,7 @@ MESSAGE_HELP = env("MESSAGE_HELP")
 MESSAGE_VERSION = env("MESSAGE_VERSION")
 MESSAGE_ABOUT = env("MESSAGE_ABOUT")
 WEBHOOK_URL = env.str("WEBHOOK_URL", "")
+PORT = env.str("PORT", "")
 
 # Enable logging
 logging.basicConfig(
@@ -87,7 +88,6 @@ def main():
         url_path=TOKEN,
         webhook_url=WEBHOOK_URL,
     )
-
 
 
 if __name__ == "__main__":
