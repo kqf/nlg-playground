@@ -11,6 +11,8 @@ from unittest.mock import patch
         "MESSAGE_THANKS": "Thanks",
         "MESSAGE_START": "Hey",
         "MESSAGE_HELP": "Help",
+        "MODEL": "123",
+        "MESSAGE_VERSION": "123",
     },
 )
 def test_imports():
