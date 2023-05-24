@@ -13,6 +13,7 @@ from unittest.mock import patch
         "MESSAGE_HELP": "Help",
         "MODEL": "123",
         "MESSAGE_VERSION": "123",
+        "MESSAGE_ABOUT": "msg",
     },
 )
 def test_imports():
