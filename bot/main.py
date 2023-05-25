@@ -15,6 +15,8 @@ MESSAGE_START = env("MESSAGE_START")
 MESSAGE_HELP = env("MESSAGE_HELP")
 MESSAGE_VERSION = env("MESSAGE_VERSION")
 MESSAGE_ABOUT = env("MESSAGE_ABOUT")
+WEBHOOK_URL = env.str("WEBHOOK_URL", "")
+PORT = env.str("PORT", "")
 
 # Enable logging
 logging.basicConfig(
@@ -75,18 +77,17 @@ def main():
     app.add_error_handler(error)
 
     # if not set, run in debug mode
-    webhook_url = env.str("WEBHOOK_URL", "")
 
-    if not webhook_url:
+    if not WEBHOOK_URL:
         app.start_polling()
         return
 
-    app.start_webhook(
+    app.run_webhook(
         listen="0.0.0.0",
-        port=env.int("PORT", "8443"),
+        port=PORT,
         url_path=TOKEN,
+        webhook_url=WEBHOOK_URL,
     )
-    app.bot.set_webhook(f"{webhook_url}/{TOKEN}")
 
 
 if __name__ == "__main__":
