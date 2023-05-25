@@ -79,7 +79,7 @@ def main():
     # if not set, run in debug mode
 
     if not WEBHOOK_URL:
-        app.start_polling()
+        app.run_polling()
         return
 
     app.run_webhook(
