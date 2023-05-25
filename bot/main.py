@@ -27,32 +27,32 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def start(update, context):
+async def start(update, context):
     """Send a message when the command /start is issued."""
-    update.message.reply_text(MESSAGE_START)
+    await update.message.reply_text(MESSAGE_START)
 
 
-def help(update, context):
+async def help(update, context):
     """Send a message when the command /help is issued."""
-    update.message.reply_text(MESSAGE_HELP)
+    await update.message.reply_text(MESSAGE_HELP)
 
 
-def version(update, context):
-    update.message.reply_text(MESSAGE_VERSION)
+async def version(update, context):
+    await update.message.reply_text(MESSAGE_VERSION)
 
 
-def about(update, context):
-    update.message.reply_text(MESSAGE_ABOUT)
+async def about(update, context):
+    await update.message.reply_text(MESSAGE_ABOUT)
 
 
-def reply(update, context, model):
+async def reply(update, context, model):
     """reply the user message."""
     uname = update.message.from_user.username
     logger.info(f"Message from @{uname}: {update.message.text}")
     message = model.reply(update, context)
     logger.info(f"Response to @{uname}: {message}")
     if message:
-        update.message.reply_text(message)
+        await update.message.reply_text(message)
 
 
 def error(update, context):
