@@ -1,4 +1,5 @@
 import logging
+import os
 from functools import partial
 
 from environs import Env
@@ -71,6 +72,9 @@ def main():
 
     # on noncommand i.e message - reply the message on Telegram
     bot = ReplyBot(MODEL_NAME, env.str("MODEL_URL", ""))
+    print("Downloaded")
+    print("The folders are here")
+    print(os.listdir())
     app.add_handler(MessageHandler(filters.TEXT, partial(reply, model=bot)))
 
     # log all errors
