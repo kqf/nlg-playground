@@ -5,7 +5,6 @@ numpy
 environs
 ipython
 markovify
-python-telegram-bot
 python-telegram-bot[webhooks]
 telethon
 tqdm
