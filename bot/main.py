@@ -5,7 +5,7 @@ from functools import partial
 from environs import Env
 from telegram.ext import Application, CommandHandler, MessageHandler, filters
 
-from bot.replybot import ReplyBot
+# from bot.replybot import ReplyBot
 
 env = Env()
 env.read_env()
@@ -50,7 +50,8 @@ async def reply(update, context, model):
     """reply the user message."""
     uname = update.message.from_user.username
     logger.info(f"Message from @{uname}: {update.message.text}")
-    message = model.reply(update, context)
+    # message = model.reply(update, context)
+    message = "test message"
     logger.info(f"Response to @{uname}: {message}")
     if message:
         await update.message.reply_text(message)
@@ -71,11 +72,11 @@ def main():
     app.add_handler(CommandHandler("about", about))
 
     # on noncommand i.e message - reply the message on Telegram
-    bot = ReplyBot(MODEL_NAME, env.str("MODEL_URL", ""))
+    # bot = ReplyBot(MODEL_NAME, env.str("MODEL_URL", ""))
     print("Downloaded")
     print("The folders are here")
     print(os.listdir())
-    app.add_handler(MessageHandler(filters.TEXT, partial(reply, model=bot)))
+    app.add_handler(MessageHandler(filters.TEXT, partial(reply, model=None)))
 
     # log all errors
     app.add_error_handler(error)
