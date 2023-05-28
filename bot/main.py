@@ -76,7 +76,7 @@ def main():
     print("Downloaded")
     print("The folders are here")
     print(os.listdir())
-    app.add_handler(MessageHandler(filters.TEXT, partial(reply, model=None)))
+    app.add_handler(MessageHandler(filters.TEXT, partial(reply, model="1234")))
 
     # log all errors
     app.add_error_handler(error)
