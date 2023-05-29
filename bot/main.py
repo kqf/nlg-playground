@@ -76,11 +76,9 @@ def main():
     logger.info(os.listdir())
     app.add_handler(MessageHandler(filters.TEXT, partial(reply, model="1234")))
 
-    # log all errors
-    app.add_error_handler(error)
-
+    # # log all errors
+    # app.add_error_handler(error)
     # if not set, run in debug mode
-
     if not WEBHOOK_URL:
         app.run_polling()
         return
