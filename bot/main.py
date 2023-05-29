@@ -64,8 +64,6 @@ def error(update, context):
 
 def main():
     app = Application.builder().token(TOKEN).build()
-
-    # on different commands - answer in Telegram
     app.add_handler(CommandHandler("start", start))
     app.add_handler(CommandHandler("help", help))
     app.add_handler(CommandHandler("version", version))
@@ -73,9 +71,9 @@ def main():
 
     # on noncommand i.e message - reply the message on Telegram
     # bot = ReplyBot(MODEL_NAME, env.str("MODEL_URL", ""))
-    print("Downloaded")
-    print("The folders are here")
-    print(os.listdir())
+    logger.info("Downloaded")
+    logger.info("The folders are here")
+    logger.info(os.listdir())
     app.add_handler(MessageHandler(filters.TEXT, partial(reply, model="1234")))
 
     # log all errors
