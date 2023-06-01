@@ -1,7 +1,8 @@
 import logging
+from functools import partial
 
 from environs import Env
-from telegram.ext import Application, CommandHandler
+from telegram.ext import Application, MessageHandler, filters
 
 # import os
 
@@ -65,7 +66,7 @@ def error(update, context):
 
 def main():
     app = Application.builder().token(TOKEN).build()
-    app.add_handler(CommandHandler("start", start))
+    # app.add_handler(CommandHandler("start", start))
     # app.add_handler(CommandHandler("help", help))
     # app.add_handler(CommandHandler("version", version))
     # app.add_handler(CommandHandler("about", about))
@@ -75,7 +76,7 @@ def main():
     # logger.info("Downloaded")
     # logger.info("The folders are here")
     # logger.info(os.listdir())
-    # app._handler(MessageHandler(filters.TEXT, partial(reply, model="1234")))
+    app.add_handler(MessageHandler(filters.TEXT, partial(reply, model="1234")))
     # log all errors
     # app.add_error_handler(error)
     if not WEBHOOK_URL:
