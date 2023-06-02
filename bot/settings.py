@@ -11,7 +11,6 @@ class Config:
 
         self.token = env("TOKEN")
         self.model_name = env.str("MODEL")
-        self.thanks_stickers = env.list("THANKS_STICKERS")
         self.message_thanks = env.str("MESSAGE_THANKS")
         self.message_start = env.str("MESSAGE_START")
         self.message_help = env.str("MESSAGE_HELP")
