@@ -1,28 +1,9 @@
 import logging
 from functools import partial
 
-from environs import Env
 from telegram.ext import Application, MessageHandler, filters
 
-# import os
-
-
-# import os
-
-
-# from bot.replybot import ReplyBot
-
-env = Env()
-env.read_env()
-
-TOKEN = env("TOKEN")
-MODEL_NAME = env("MODEL")
-MESSAGE_START = env("MESSAGE_START")
-MESSAGE_HELP = env("MESSAGE_HELP")
-MESSAGE_VERSION = env("MESSAGE_VERSION")
-MESSAGE_ABOUT = env("MESSAGE_ABOUT")
-WEBHOOK_URL = env.str("WEBHOOK_URL", "")
-PORT = env.str("PORT", "")
+from bot.settings import config
 
 # Enable logging
 logging.basicConfig(
@@ -35,20 +16,20 @@ logger = logging.getLogger(__name__)
 
 async def start(update, context):
     """Send a message when the command /start is issued."""
-    await update.message.reply_text(MESSAGE_START)
+    await update.message.reply_text(config.message_start)
 
 
 async def help(update, context):
     """Send a message when the command /help is issued."""
-    await update.message.reply_text(MESSAGE_HELP)
+    await update.message.reply_text(config.message_help)
 
 
 async def version(update, context):
-    await update.message.reply_text(MESSAGE_VERSION)
+    await update.message.reply_text(config.message_version)
 
 
 async def about(update, context):
-    await update.message.reply_text(MESSAGE_ABOUT)
+    await update.message.reply_text(config.message_about)
 
 
 async def reply(update, context, model):
@@ -68,7 +49,7 @@ def error(update, context):
 
 
 def main():
-    app = Application.builder().token(TOKEN).build()
+    app = Application.builder().token(config.token).build()
     # app.add_handler(CommandHandler("start", start))
     # app.add_handler(CommandHandler("help", help))
     # app.add_handler(CommandHandler("version", version))
@@ -82,15 +63,15 @@ def main():
     app.add_handler(MessageHandler(filters.TEXT, partial(reply, model="1234")))
     # log all errors
     # app.add_error_handler(error)
-    if not WEBHOOK_URL:
+    if not config.webhook:
         app.run_polling()
         return
 
     app.run_webhook(
         listen="0.0.0.0",
-        port=PORT,
-        url_path=TOKEN,
-        webhook_url=WEBHOOK_URL,
+        port=config.port,
+        url_path=config.token,
+        webhook_url=config.webhook,
     )
 
 
