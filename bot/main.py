@@ -3,6 +3,7 @@ from functools import partial
 
 from telegram.ext import Application, CommandHandler, MessageHandler, filters
 
+from bot.replybot import ReplyBot
 from bot.settings import config
 
 # Enable logging
@@ -55,12 +56,12 @@ def main():
     app.add_handler(CommandHandler("version", version))
     app.add_handler(CommandHandler("about", about))
 
-    # # on noncommand i.e message - reply the message on Telegram
-    # # bot = ReplyBot(MODEL_NAME, env.str("MODEL_URL", ""))
+    # on noncommand i.e message - reply the message on Telegram
+    bot = ReplyBot(config.model_name, config.model_url)
     logger.info("Downloaded")
     logger.info("The folders are here")
     # logger.info(os.listdir())
-    app.add_handler(MessageHandler(filters.TEXT, partial(reply, model="1234")))
+    app.add_handler(MessageHandler(filters.TEXT, partial(reply, model=bot)))
     # log all errors
     app.add_error_handler(error)
     if not config.webhook:
