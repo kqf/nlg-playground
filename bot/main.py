@@ -1,7 +1,7 @@
 import logging
 from functools import partial
 
-from telegram.ext import Application, MessageHandler, filters
+from telegram.ext import Application, CommandHandler, MessageHandler, filters
 
 from bot.settings import config
 
@@ -50,19 +50,19 @@ def error(update, context):
 
 def main():
     app = Application.builder().token(config.token).build()
-    # app.add_handler(CommandHandler("start", start))
-    # app.add_handler(CommandHandler("help", help))
-    # app.add_handler(CommandHandler("version", version))
-    # app.add_handler(CommandHandler("about", about))
+    app.add_handler(CommandHandler("start", start))
+    app.add_handler(CommandHandler("help", help))
+    app.add_handler(CommandHandler("version", version))
+    app.add_handler(CommandHandler("about", about))
 
     # # on noncommand i.e message - reply the message on Telegram
     # # bot = ReplyBot(MODEL_NAME, env.str("MODEL_URL", ""))
-    # logger.info("Downloaded")
-    # logger.info("The folders are here")
+    logger.info("Downloaded")
+    logger.info("The folders are here")
     # logger.info(os.listdir())
     app.add_handler(MessageHandler(filters.TEXT, partial(reply, model="1234")))
     # log all errors
-    # app.add_error_handler(error)
+    app.add_error_handler(error)
     if not config.webhook:
         app.run_polling()
         return
