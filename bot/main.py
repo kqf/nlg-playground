@@ -1,4 +1,5 @@
 import logging
+import os
 from functools import partial
 
 from telegram.ext import Application, CommandHandler, MessageHandler, filters
@@ -37,8 +38,7 @@ async def reply(update, context, model):
     """reply the user message."""
     uname = update.message.from_user.username
     logger.info(f"Message from @{uname}: {update.message.text}")
-    # message = model.reply(update, context)
-    message = "test message"
+    message = model.reply(update, context)
     logger.info(f"Response to @{uname}: {message}")
     if message:
         await update.message.reply_text(message)
@@ -60,7 +60,7 @@ def main():
     bot = ReplyBot(config.model_name, config.model_url)
     logger.info("Downloaded")
     logger.info("The folders are here")
-    # logger.info(os.listdir())
+    logger.info(os.listdir())
     app.add_handler(MessageHandler(filters.TEXT, partial(reply, model=bot)))
     # log all errors
     app.add_error_handler(error)
