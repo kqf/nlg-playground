@@ -11,6 +11,7 @@ class Config:
 
         self.token = env("TOKEN")
         self.model_name = env.str("MODEL")
+        self.model_url = env.str("MODEL_URL", "")
         self.message_start = env.str("MESSAGE_START")
         self.message_help = env.str("MESSAGE_HELP")
         self.message_version = env.str("MESSAGE_VERSION")
