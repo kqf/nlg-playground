@@ -58,9 +58,6 @@ def main():
 
     # on noncommand i.e message - reply the message on Telegram
     bot = ReplyBot(config.model_name, config.model_url)
-    logger.info("Downloaded")
-    logger.info("The folders are here")
-    logger.info(os.listdir())
     app.add_handler(MessageHandler(filters.TEXT, partial(reply, model=bot)))
     # log all errors
     app.add_error_handler(error)
