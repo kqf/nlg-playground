@@ -1,11 +1,10 @@
 import logging
-import os
 from functools import partial
 
 from telegram.ext import Application, CommandHandler, MessageHandler, filters
 
+import bot.settings as config
 from bot.replybot import ReplyBot
-from bot.settings import config
 
 # Enable logging
 logging.basicConfig(
