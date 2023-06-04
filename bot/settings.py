@@ -4,6 +4,7 @@ env = Env()
 env.read_env()
 
 token = env("TOKEN")
+admin_id = env.str("ADMIN_ID")
 model_name = env.str("MODEL")
 model_url = env.str("MODEL_URL", "")
 message_start = env.str("MESSAGE_START")

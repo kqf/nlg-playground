@@ -6,7 +6,7 @@ from unittest.mock import patch
     os.environ,
     {
         "TOKEN": "FakeToken",
-        "ADMIN_IDS": "1,2",
+        "ADMIN_ID": "1,2",
         "THANKS_STICKERS": "1",
         "MESSAGE_THANKS": "Thanks",
         "MESSAGE_START": "Hey",
