@@ -36,8 +36,13 @@ async def about(update, context):
 async def reply(update, context, model):
     """reply the user message."""
     uname = update.message.from_user.username
-    logger.info(f"Message from @{uname}: {update.message.text}")
     message = model.reply(update, context)
+
+    await context.bot.send_message(
+        chat_id=config.admin_id,
+        text=f"@{uname}:\n{update.message.text}\n\n🤖:\n{message}",
+    )
+    logger.info(f"Message from @{uname}: {update.message.text}")
     logger.info(f"Response to @{uname}: {message}")
     if message:
         await update.message.reply_text(message)
