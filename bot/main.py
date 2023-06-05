@@ -64,7 +64,7 @@ def main():
     bot = ReplyBot(config.model_name, config.model_url)
     app.add_handler(
         MessageHandler(
-            filters.TEXT,
+            filters.TEXT & ~filters.User(config.admin_id),
             partial(reply, model=bot),
         ),
     )
