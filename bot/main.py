@@ -62,7 +62,12 @@ def main():
 
     # on noncommand i.e message - reply the message on Telegram
     bot = ReplyBot(config.model_name, config.model_url)
-    app.add_handler(MessageHandler(filters.TEXT, partial(reply, model=bot)))
+    app.add_handler(
+        MessageHandler(
+            filters.TEXT & ~filters.User(config.admin_id),
+            partial(reply, model=bot),
+        ),
+    )
     # log all errors
     app.add_error_handler(error)
     if not config.webhook:
