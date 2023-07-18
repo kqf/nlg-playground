@@ -1,4 +1,4 @@
-# Natural Language Generation playground [![Build Status](https://travis-ci.com/kqf/nlg-playground.svg?branch=master)](https://travis-ci.com/kqf/nlg-playground)
+# Natural Language Generation playground [![tests](https://github.com/kqf/nlg-playground/actions/workflows/ci.yml/badge.svg)](https://github.com/kqf/nlg-playground/actions/workflows/ci.yml)
 
 Tests in progress ...
 
