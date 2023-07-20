@@ -10,7 +10,6 @@ profile = "black"
 
 [tool.mypy]
 ignore_missing_imports = true
-plugins = "sqlmypy"
 
 [project.scripts]
 nlg-train = "model.main:train"
